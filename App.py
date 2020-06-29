@@ -7,9 +7,8 @@ from PyQt5.QtWidgets import *
 import Catalog as Catalog
 import VendingMachine as VM
 import InitVendingMachine as InitVM
-############################
+
 CurrentProducts=InitVM.vm.list
-############################
 
 Window_Top=0
 Window_Left=0
@@ -25,38 +24,42 @@ NoProduct  = Catalog.NoProduct
 def FindProductMatch(comboSelectProduct, comboSelectQuantity, Pos):
 	SelectedProduct=None
 	for j in InitVM.InitProducts:
-		if (comboSelectProduct[Pos].currentText() == j.Name):
-			#print(comboSelectProduct[Pos].currentText(), "Debe ser igual a ",  j.Name)				
+		if (comboSelectProduct[Pos].currentText() == j.Name):				
 			SelectedProduct= j 
 	return SelectedProduct
 				
-	
-	#		print(comboSelectProduct[i].currentText())
-			#print(comboSelectQuantity[0].currentText())
 	
 
 class WindowMain(QMainWindow):
 	def __init__(self):
 		super().__init__()
-		self.title = "Powered by Circuititos S.A."
+		self.title = "Initial Screen"
 		self.top = Window_Top
 		self.left = Window_Left 
 		self.width = Window_Width
 		self.height = Window_Height
 		self.InitUI()   
-	        #self.setStyleSheet("QWidget {background-image: url(Pictures/snacks.jpg)}")
+		
 
 	def InitUI(self):
 		self.setWindowTitle(self.title)
 		self.setGeometry(self.top, self.left, self.width, self.height)
-
-		buttonAdmin = QPushButton('Administration', self) 
-		buttonAdmin.move(100, 100)
-		buttonAdmin.clicked.connect(self.buttonAdmin_onClick)
 		
 		buttonBuy = QPushButton('Buy', self) 
-		buttonBuy.move(100, 300)
+		buttonBuy.setGeometry(100, 75, 600, 200)
 		buttonBuy.clicked.connect(self.buttonBuy_onClick)
+		buttonBuy.setStyleSheet("background-color:Green; color: Black")	
+		buttonBuy.setFont(QFont('Times', 40))	
+
+		buttonAdmin = QPushButton(' Administration ', self) 
+		buttonAdmin.setGeometry(100, 275, 600, 200)
+		buttonAdmin.clicked.connect(self.buttonAdmin_onClick)
+		buttonAdmin.setStyleSheet("background-color: Yellow; color: Black")
+		buttonAdmin.setFont(QFont('Times', 40))	
+
+		MSG_Label = QLabel("Powered by Circuititos S.A.", self)
+		MSG_Label.move(300, 550)
+		MSG_Label.adjustSize()
 
 		self.show()
 
@@ -91,15 +94,12 @@ class WindowBuy(QDialog):
 		InventoryQuantity=[]    #This is tha amount of each product
 		for a in CurrentProducts:
 			if (a.Product != None and a.Product != NoProduct):							
-				if a.Product in InventoryProduct:
-					#print("Into the IF")				
+				if a.Product in InventoryProduct:				
 					Inventory_Index = InventoryProduct.index(a.Product)
 					InventoryQuantity[Inventory_Index]+=a.Quantity
 				else: 	
-					print("Into the ELSE")
 					InventoryProduct.append(a.Product)
 					InventoryQuantity.append(a.Quantity)
-					#print(Inventory)
 
 		
 		for i in InventoryProduct:
@@ -108,8 +108,8 @@ class WindowBuy(QDialog):
 				label.setPixmap(im)
 				label.setAlignment(Qt.AlignCenter)
 				Pos=InventoryProduct.index(i)
-				X_pos=Pos//5
-				Y_pos=Pos%5
+				X_pos=Pos%5
+				Y_pos=Pos//5
 
 				grid.addWidget(label,X_pos,2*Y_pos)              #Adding the product's Logo			
 				AvailableMSG= "Available: " + str(InventoryQuantity[Pos]) + "\n" + "Cost: ₡" +  str(i.Cost)
@@ -216,6 +216,10 @@ class WindowAdmin(QDialog):
 				BackButton.clicked.connect(self.BackButton_UpdateWindow_onClick)
 		self.setLayout(grid)
 		self.show()
+
+	###################
+	#Widget Actions:
+	###################
 	@pyqtSlot()
 	def CancelButton_UpdateWindow_onClick(self):
 		self.cams = WindowAdmin()	

@@ -21,14 +21,20 @@ comboSelectQ=[]
 NoProduct  = Catalog.NoProduct
 
 
-def FindProductMatch(comboSelectProduct, comboSelectQuantity, Pos):
+def FindProductMatchP(comboSelectProduct, Pos):
 	SelectedProduct=None
 	for j in InitVM.InitProducts:
 		if (comboSelectProduct[Pos].currentText() == j.Name):				
 			SelectedProduct= j 
 	return SelectedProduct
 				
-	
+#def FindProductMatchQ(comboSelectProduct, Pos):
+#	SelectedProduct=None
+#	for j in InitVM.InitProducts:
+#		if (comboSelectProduct[Pos].currentText() == j.Name):				
+#			SelectedProduct= j 
+#	return SelectedProduct	
+
 
 class WindowMain(QMainWindow):
 	def __init__(self):
@@ -151,8 +157,25 @@ class WindowCatalog(QDialog):
 					MSGLabel = QLabel(AvailableMSG)
 					
 				grid.addWidget(MSGLabel,X_pos, (2*Y_pos)+1)      #Adding product's Info 
+
+		buttonBack = QPushButton('Back', self) 
+		#buttonAdmin.setGeometry(100, 275, 600, 200)
+		buttonBack.clicked.connect(self.buttonBack_FromCatalog_ToSetUpVM_onClick)
+		#buttonAdmin.setStyleSheet("background-color: Yellow; color: Black")
+		#buttonClear.setFont(QFont('Times', 40))	
+		grid.addWidget(buttonBack,11,2)
+
 		self.setLayout(grid)
 		self.show()
+
+	###################
+	#Widget Actions:
+	###################
+	@pyqtSlot()
+	def buttonBack_FromCatalog_ToSetUpVM_onClick(self):	
+		self.cams = WindowAdmin()	
+		self.cams.show()
+		self.close()  
 
 class WindowAdmin(QDialog):
 	def __init__(self, parent=None):
@@ -203,16 +226,16 @@ class WindowAdmin(QDialog):
 				UpdateButton= QPushButton('Update', self)
 				CancelButton= QPushButton('Cancel', self)
 				BackButton= QPushButton('Back', self)
-				PreviewButton= QPushButton('Preview', self)   
+				RemoveAllButton= QPushButton('Remove All', self)   
 
-				grid.addWidget(PreviewButton, 11, 5)				
-				grid.addWidget(UpdateButton,  11, 6)
-				grid.addWidget(CancelButton,  11, 7)
-				grid.addWidget(BackButton,    11, 8)
+				grid.addWidget(RemoveAllButton, 11, 5)				
+				grid.addWidget(UpdateButton,    11, 6)
+				grid.addWidget(CancelButton,    11, 7)
+				grid.addWidget(BackButton,      11, 8)
 
 				UpdateButton.clicked.connect(self.UpdateButton_UpdateWindow_onClick)
 				CancelButton.clicked.connect(self.CancelButton_UpdateWindow_onClick)
-				PreviewButton.clicked.connect(self.PreviewButton_UpdateWindow_onClick)
+				RemoveAllButton.clicked.connect(self.RemoveAllButton_UpdateWindow_onClick)
 				BackButton.clicked.connect(self.BackButton_UpdateWindow_onClick)
 		self.setLayout(grid)
 		self.show()
@@ -232,16 +255,21 @@ class WindowAdmin(QDialog):
 		for i in Row:
 			for j in Col:
 				Pos=VM.getListPos(i,j)			
-				Product= FindProductMatch(comboSelectP, comboSelectQ, Pos)			
+				Product= FindProductMatchP(comboSelectP, Pos)			
 				if Product != None:	
-					InitVM.vm.UpdateQueue(i, int(j), Product, 2)						
-		CurrentProducts=InitVM.vm.list
-		print("I pressed update Button")				
+					InitVM.vm.UpdateQueue(i, int(j), Product, 2)				
+				SelectedQuantity= comboSelectQ[Pos].currentText()
+				CurrentP= InitVM.vm.list[Pos].Product 				
+				if SelectedQuantity!="Quantity" and CurrentP != Catalog.NoProduct and CurrentP != None:
+					InitVM.vm.list[Pos].Quantity= int(SelectedQuantity) 				
+											
+		CurrentProducts=InitVM.vm.list 				
 		self.cams = WindowCatalog()	
 		self.cams.show()
 		self.close()   
 	@pyqtSlot()
-	def PreviewButton_UpdateWindow_onClick(self):
+	def RemoveAllButton_UpdateWindow_onClick(self):
+		InitVM.vm.ClearVM()
 		self.cams = WindowCatalog()	
 		self.cams.show()
 		self.close()  
@@ -249,7 +277,7 @@ class WindowAdmin(QDialog):
 	def BackButton_UpdateWindow_onClick(self):	
 		self.cams = WindowMain()	
 		self.cams.show()
-		self.close()             
+		self.close()       
 
 
 def Invoque_GUI():	  

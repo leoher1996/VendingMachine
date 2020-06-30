@@ -57,6 +57,16 @@ class NewVendingMachine:
 	
 	#def Extract_Product(self, Product):
 	#This function will extract a unit of the product from the queue with the lower amount.
+
+	def ClearVM(self):
+		Row= "ABCDE"
+		Col= "12345"		
+		for i in Row:
+			for j in Col:
+				Pos=getListPos(i,j)
+				self.list[Pos].Product = Catalog.NoProduct
+				self.list[Pos].Quantity = 0 
+		
 	
 
 

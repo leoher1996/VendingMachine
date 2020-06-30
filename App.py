@@ -27,13 +27,6 @@ def FindProductMatchP(comboSelectProduct, Pos):
 		if (comboSelectProduct[Pos].currentText() == j.Name):				
 			SelectedProduct= j 
 	return SelectedProduct
-				
-#def FindProductMatchQ(comboSelectProduct, Pos):
-#	SelectedProduct=None
-#	for j in InitVM.InitProducts:
-#		if (comboSelectProduct[Pos].currentText() == j.Name):				
-#			SelectedProduct= j 
-#	return SelectedProduct	
 
 
 class WindowMain(QMainWindow):
@@ -45,7 +38,6 @@ class WindowMain(QMainWindow):
 		self.width = Window_Width
 		self.height = Window_Height
 		self.InitUI()   
-		
 
 	def InitUI(self):
 		self.setWindowTitle(self.title)
@@ -80,6 +72,9 @@ class WindowMain(QMainWindow):
 		self.cams = WindowBuy()	
 		self.cams.show()
 		self.close()                                   #Closes the window passed as self.
+
+
+
 
 #This is the window that's being developed by willy. 
 class WindowBuy(QDialog):
@@ -127,6 +122,7 @@ class WindowBuy(QDialog):
 
 
 
+
 class WindowCatalog(QDialog):
 	def __init__(self, parent=None):
 		super().__init__(parent)
@@ -169,13 +165,15 @@ class WindowCatalog(QDialog):
 		self.show()
 
 	###################
-	#Widget Actions:
+	#Widget Actions for WindowCatalog:
 	###################
 	@pyqtSlot()
 	def buttonBack_FromCatalog_ToSetUpVM_onClick(self):	
 		self.cams = WindowAdmin()	
 		self.cams.show()
 		self.close()  
+
+
 
 class WindowAdmin(QDialog):
 	def __init__(self, parent=None):
@@ -241,7 +239,7 @@ class WindowAdmin(QDialog):
 		self.show()
 
 	###################
-	#Widget Actions:
+	#Widget Actions for WindowAdmin:
 	###################
 	@pyqtSlot()
 	def CancelButton_UpdateWindow_onClick(self):
@@ -278,6 +276,8 @@ class WindowAdmin(QDialog):
 		self.cams = WindowMain()	
 		self.cams.show()
 		self.close()       
+
+
 
 
 def Invoque_GUI():	  

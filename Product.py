@@ -1,3 +1,4 @@
+#This file implements a class NewProduct.
 class NewProduct:
 	def __init__(self, Name, Cost, Temperature, LogoPath):
 		self.Name = Name                   #Product's name. (Type String)

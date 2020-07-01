@@ -4,7 +4,7 @@ import Product as Product
 import Catalog as Catalog
 
 ############################
-#Method getListPos is a useful function to get a position [0,24] from the row and column on a vending machine. 
+#Function getListPos is a useful function to get a position [0,24] from the row and column on a vending machine. 
 #Arg: Row corresponds to the row in a vending machine, refered as {A,B,C,D,E}
 #     Col corresponds to the column in a vending machine, refered as {1,2,3,4,5}
 ############################
@@ -12,6 +12,20 @@ def getListPos(Row, Col):
 	Pos= (int(Col)-1)
 	Pos+= (5*(ord(Row)-65))   #ord() returns unicode characted represented by an integer. ('A' -> 65)
 	return Pos
+
+############################
+#Function get_X and get_Y are a useful functions to convert row and column on a vending machine to a position X and Y on a [1,5] range. 
+#Arg: Row corresponds to the row in a vending machine, refered as {A,B,C,D,E}
+#     Col corresponds to the column in a vending machine, refered as {1,2,3,4,5}
+############################
+def get_X(Queue):
+	X_pos=int(ord(Queue.Row)-65)
+	return X_pos	
+
+def get_Y(Queue):
+	Y_pos=int(Queue.Column)
+	return Y_pos
+
 
 
 class NewVendingMachine:

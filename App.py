@@ -112,6 +112,10 @@ class WindowMain(QMainWindow):
 
 
 #TODO: This is the window that's being developed by willy. 
+############################
+#This class implements the Buy Window. 
+#This window allows the user to buy products.  
+############################
 class WindowBuy(QDialog):
 	def __init__(self, parent=None):
 		super().__init__(parent)
@@ -126,6 +130,7 @@ class WindowBuy(QDialog):
 
 		grid = QGridLayout()
 		
+		#Lists used to store an inventary. They should match then InventoryQuantity[x] is the amount of products of InventoryProduct[x].
 		InventoryProduct =[]    #This is a list of products.
 		InventoryQuantity=[]    #This is tha amount of each product
 		
@@ -143,13 +148,11 @@ class WindowBuy(QDialog):
 				#This code adds a pixmap throught the label. 
 				label = QLabel(self)				
 				Add_Image_As_Label(i,label)
-
-
 				Pos=InventoryProduct.index(i)
 				X_pos=Pos%5
 				Y_pos=Pos//5
-
 				grid.addWidget(label,X_pos,2*Y_pos)              			
+				#This code adds some useful information about each product.
 				AvailableMSG= "Available: " + str(InventoryQuantity[Pos]) + "\n" + "Cost: ₡" +  str(i.Cost)
 				MSGLabel = QLabel(AvailableMSG)
 				grid.addWidget(MSGLabel,X_pos, (2*Y_pos)+1)      
@@ -188,22 +191,25 @@ class WindowAdmin(QDialog):
 				X_pos=VM.get_X(i)
 				Y_pos=VM.get_Y(i)
 
+				#The code below is used to implement the combo box options
+				#Select Product options
 				comboSelectProduct = QComboBox(self)
 				comboSelectProduct.addItem("Edit Product")
 				for x in InitVM.InitProducts:
 					comboSelectProduct.addItem(x.Name)
-								
+				#Select Quantity options				
 				comboSelectQuantity = QComboBox(self)
 				comboSelectQuantity.addItem("Quantity")
 				for y in range(1,6):				
 					comboSelectQuantity.addItem(str(y))
 
-				comboSelectP.append(comboSelectProduct)
-				comboSelectQ.append(comboSelectQuantity)
-
 				grid.addWidget(label,2*X_pos,2*Y_pos)           
 				grid.addWidget(comboSelectProduct,(2*X_pos)+1,2*Y_pos)      	
-				grid.addWidget(comboSelectQuantity,(2*X_pos)+1,(2*Y_pos)+1)		
+				grid.addWidget(comboSelectQuantity,(2*X_pos)+1,(2*Y_pos)+1)
+				
+				#Code to include combo box widgets, and read from them as required.
+				comboSelectP.append(comboSelectProduct)
+				comboSelectQ.append(comboSelectQuantity)
 
 				#This code sets the message next to each product.				
 				if i.Quantity==0:
@@ -313,7 +319,7 @@ class WindowCatalog(QDialog):
 					AvailableMSG= "Available: " + str(i.Quantity) + "\n" + "Cost: ₡" +  str(i.Product.Cost)
 					MSGLabel = QLabel(AvailableMSG)	
 				grid.addWidget(MSGLabel,X_pos, (2*Y_pos)+1)      
-
+		#This Back button is used to get out of the catalog window, to a previous window.  
 		buttonBack = QPushButton('Back', self) 
 		buttonBack.clicked.connect(self.buttonBack_FromCatalog_ToSetUpVM_onClick)	
 		grid.addWidget(buttonBack,11,2)

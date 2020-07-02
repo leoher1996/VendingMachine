@@ -197,6 +197,7 @@ class WindowAdmin(QDialog):
 				comboSelectProduct.addItem("Edit Product")
 				for x in InitVM.InitProducts:
 					comboSelectProduct.addItem(x.Name)
+				comboSelectProduct.addItem("Empty")
 				#Select Quantity options				
 				comboSelectQuantity = QComboBox(self)
 				comboSelectQuantity.addItem("Quantity")
@@ -250,20 +251,59 @@ class WindowAdmin(QDialog):
 		self.close()  
 	@pyqtSlot()
 	def UpdateButton_AdminWindow_onClick(self):
+		#The following set of fors goes throught all the Queues of the vending machine. 
 		Row= "ABCDE"
 		Col= "12345"		
 		for i in Row:
 			for j in Col:
-				Pos=VM.getListPos(i,j)			
-				Product= FindProductMatchP(comboSelectP, Pos)			
-				if Product != None:	
-					InitVM.vm.UpdateQueue(i, int(j), Product, 2)				
-				SelectedQuantity= comboSelectQ[Pos].currentText()
-				CurrentP= InitVM.vm.list[Pos].Product 				
-				if SelectedQuantity!="Quantity" and CurrentP != Catalog.NoProduct and CurrentP != None:
-					InitVM.vm.list[Pos].Quantity= int(SelectedQuantity) 				
+				Pos=VM.getListPos(i,j)		                          #Gets a [0,24] position.	
+					
+				SelQuantity= comboSelectQ[Pos].currentText()		  #Returns a the quantity selected in the combo box for widget at [Pos].
+				SelProduct= comboSelectQ[Pos].currentText()		  #Returns a the product selected in the combo box for widget at [Pos].
+				Product= FindProductMatchP(comboSelectP, Pos)		  #Returns the product instance selected in the combo box, or None				
+				CurrentP= InitVM.vm.list[Pos].Product 		  	  #Reads the current product and returns it on CurrentP.		
+
+				#Case when a queue is empty and a NewProduct is added. 
+				if CurrentP == Catalog.NoProduct:
+					if Product != None:
+						if SelQuantity != "Quantity":	
+							InitVM.vm.UpdateQueue(i, int(j), Product, int(SelQuantity))	
+				#Case when the queue already has elements. 				
+				else:
+					if Product != None:		
+						if SelQuantity!="Quantity":			
+							#Modify the quantity and the Product	
+							InitVM.vm.UpdateQueue(i, int(j), Product, int(SelQuantity))	
+						else:   
+						
+							#Just modify the product, not the quantity. 
+							InitVM.vm.UpdateQueue(i, int(j), Product, InitVM.vm.list[Pos].Quantity)
+	
+					else:   #Case when the selection is not a product. 
+						if comboSelectP[Pos].currentText() == "Edit Product":
+							#Just modify the quantity, not the product.
+							if SelQuantity!="Quantity":				
+								InitVM.vm.UpdateQueue(i, int(j), CurrentP, int(SelQuantity))
+						#case when the selected product is "Empty"						
+						else:
+							InitVM.vm.UpdateQueue(i, int(j), Catalog.NoProduct, 0)
+						
+
+
+
+					 
+						
+					#This code manages the "Empty" selection on the product combo box.
+					#if:			
+				#and CurrentP != Catalog.NoProduct and CurrentP != None:
+
+				
+
+					#InitVM.vm.list[Pos].Quantity= int(SelectedQuantity) 				
 															
 		#This code clears both lists with the combo box reads. 
+		
+
 		comboSelectP.clear()
 		comboSelectQ.clear()
 		

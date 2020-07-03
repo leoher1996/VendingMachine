@@ -71,7 +71,20 @@ class WindowMain(QMainWindow):
 		#Button widgets and label present on the window.
 		buttonBuy = QPushButton("Buy", self)			#Button to buy a product. 
 		buttonAdmin = QPushButton(" Administration ", self) 	#Admin to set up the vending machine products.
-		MSG_Label = QLabel("Powered by Circuititos S.A.", self)	#Label to display an information message about the author.	
+		MSG_Label = QLabel("Powered by Circuititos S.A.", self)	#Label to display an information message about the author.
+		
+		#The following label implements the temperature information. 
+		RoomTempMSG=("Temp: 27°C")         #Message for Room Temp products
+		ColdTempMSG=("Temp: 4°C")          #Message for Room Temp products	
+		if(InitVM.vm.Temp == 'C'):
+			#Case when current products temperature is cold.
+			MSG_To_Display_Temp = ColdTempMSG	
+		else:
+			#Case when current products temperature is room.
+			MSG_To_Display_Temp = RoomTempMSG
+		MSG_Temp = QLabel(MSG_To_Display_Temp, self)	#Label to display temperature info.
+
+
 
 		#Code to set size and position for the button widgets.  
 		X_border_W=150
@@ -80,15 +93,20 @@ class WindowMain(QMainWindow):
 		buttonBuy.setGeometry(X_border_W, Y_border_W, Window_Width-2*X_border_W, Y_Buttons_W)
 		buttonAdmin.setGeometry(X_border_W, Y_border_W+Y_Buttons_W , Window_Width-2*X_border_W, Y_Buttons_W)
 
-		#Code to set size and position for the label. 
+		#Code to set size and position for the labels. 
+		#Powered by label.
 		MSG_Label.move(450, 650)
 		MSG_Label.adjustSize()
-		
+		#Temperature label
+		InitX , InitY, Width, Height = 750, 40, 2000, 100 
+		MSG_Temp.setGeometry(InitX , InitY, Width, Height)		
+		MSG_Temp.setFont(QFont("Times", 35))
+
 		#Code to set the buttons style.		
 		buttonAdmin.setStyleSheet("background-color: Yellow; color: Black")
 		buttonAdmin.setFont(QFont("Times", 40))	
 		buttonBuy.setStyleSheet("background-color:Green; color: Black")	
-		buttonBuy.setFont(QFont("Times", 40))
+		buttonBuy.setFont(QFont("Times", 35))
 		
 		#Code to assign the corresponding functions calls when pressing the buttons.
 		buttonAdmin.clicked.connect(self.buttonAdmin_onClick)
@@ -330,8 +348,6 @@ class WindowAdmin(QDialog):
 			#Case when current products temperature is room.
 			InitVM.vm.Temp = 'C'
 			InitVM.InitProducts = InitVM.InitProducts_Cold
-			
-
 		#This code clears both lists with the combo box reads and also the vending machine products.
 		comboSelectP.clear()
 		comboSelectQ.clear()

@@ -49,6 +49,7 @@ def Add_Image_As_Label(i,label):
 		im = QPixmap(i.LogoPath)
 	label.setPixmap(im)
 	label.setAlignment(Qt.AlignCenter)
+	
 
 ############################
 #This class implements the Main Window. 
@@ -98,7 +99,7 @@ class WindowMain(QMainWindow):
 		MSG_Label.move(450, 650)
 		MSG_Label.adjustSize()
 		#Temperature label
-		InitX , InitY, Width, Height = 750, 40, 2000, 100 
+		InitX , InitY, Width, Height = 750, 40, 250, 100 
 		MSG_Temp.setGeometry(InitX , InitY, Width, Height)		
 		MSG_Temp.setFont(QFont("Times", 35))
 
@@ -111,7 +112,7 @@ class WindowMain(QMainWindow):
 		#Code to assign the corresponding functions calls when pressing the buttons.
 		buttonAdmin.clicked.connect(self.buttonAdmin_onClick)
 		buttonBuy.clicked.connect(self.buttonBuy_onClick)
-		
+
 		self.show()
 
 	@pyqtSlot()
@@ -160,23 +161,94 @@ class WindowBuy(QDialog):
 				else: 	
 					InventoryProduct.append(a.Product)
 					InventoryQuantity.append(a.Quantity)
+		if (len(InventoryProduct)==0):
+			#This is the case where the vending machine is empty. 
+			#A label is added, stating that the vending machine is empty. 
+			MSG_NoProducts_Label = QLabel("The vending machine is empty.",self)	
+			InitX , InitY, Width, Height = 250, 300, 600, 100 
+			MSG_NoProducts_Label.setGeometry(InitX , InitY, Width, Height)		
+			MSG_NoProducts_Label.setFont(QFont("Times", 35))			
 
-		
-		for i in InventoryProduct:
+			#The following button allows the administrator to move to the main window. 	
+			BackButton= QPushButton('Back', self)
+			InitX , InitY, Width, Height = 50, 720, 100, 50 
+			BackButton.setGeometry(InitX , InitY, Width, Height)	
+ 
+		else:
+			#This is the case where the vending machine is not empty. 
+			#A label is added with the titles on the top of the window.  
+			Product_Type_Column = QLabel("Product",self)	
+			grid.addWidget(Product_Type_Column,0, 0) 
+			Product_Type_Column.setAlignment(Qt.AlignCenter)
+			
+			Info_Column = QLabel("Info",self)	
+			grid.addWidget(Info_Column,0, 1)
+			Info_Column.setAlignment(Qt.AlignCenter)
+
+			Info_Column = QLabel("Select the quantity to buy",self)	
+			grid.addWidget(Info_Column,0, 2)
+			Info_Column.setAlignment(Qt.AlignCenter)
+
+			for i in InventoryProduct:
 				#This code adds a pixmap throught the label. 
 				label = QLabel(self)				
 				Add_Image_As_Label(i,label)
 				Pos=InventoryProduct.index(i)
-				X_pos=Pos%5
-				Y_pos=Pos//5
+				X_pos=Pos%5 +1 
+				Y_pos=Pos//5  
 				grid.addWidget(label,X_pos,2*Y_pos)              			
 				#This code adds some useful information about each product.
 				AvailableMSG= "Available: " + str(InventoryQuantity[Pos]) + "\n" + "Cost: ₡" +  str(i.Cost)
 				MSGLabel = QLabel(AvailableMSG)
-				grid.addWidget(MSGLabel,X_pos, (2*Y_pos)+1)      
+				MSGLabel.setAlignment(Qt.AlignCenter) #Aligns the message info at the center of the screen.
+				grid.addWidget(MSGLabel,X_pos, (2*Y_pos)+1)   
+				#This code adds the spin boxes to select the amount of units you want to buy.
+				sp_box = QSpinBox()
+				sp_box.setMinimum(0)
+				sp_box.setMaximum(InventoryQuantity[Pos])
+				grid.addWidget(sp_box, X_pos, (2*Y_pos)+2)
+      				#sp.valueChanged.connect(self.valuechange)  				
+			
+				#This code sets the messages with the prices to pay				
+				Price_To_Pay_Per_Product= QLabel("+ ₡0")
+				grid.addWidget(Price_To_Pay_Per_Product, X_pos, (2*Y_pos)+3) 
+
+			#This label states the total amount of money the user has to pay.				
+			Price_To_Pay_Total= QLabel("Total: ₡0")
+			grid.addWidget(Price_To_Pay_Total, 6, 3) 
+	
+			#The following button allows the user to move to the main window. 	
+			BackButton= QPushButton('Back', self)	
+			grid.addWidget(BackButton, 7, 0)
+
+			#The following button allows the user to add products to a cart. 	
+			BuyButton= QPushButton('Add to cart', self)	
+			grid.addWidget(BuyButton, 6, 2)
+			BuyButton.setStyleSheet("background-color:Yellow; color: Black")	
+							
+			#The following button allows the user to buy a cart. 	
+			BuyButton= QPushButton('Buy cart', self)	
+			grid.addWidget(BuyButton, 7, 3)
+			BuyButton.setStyleSheet("background-color:Green; color: Black")	
+
+		#Sets some information for the Back Button. 
+		BackButton.clicked.connect(self.BackButton_AdminBuy_onClick)		
+		BackButton.setToolTip("Back to main window.")  #Sets tooltip.
+		
+		#Clear lists for the following calls of this function.
+		comboSelectP.clear()
+		comboSelectQ.clear()
+ 
 		self.setLayout(grid)
 		self.show()
-
+	###################
+	#Widget Actions for WindowBuy:
+	###################
+	@pyqtSlot()
+	def BackButton_AdminBuy_onClick(self):	
+		self.cams = WindowMain()	
+		self.cams.show()
+		self.close()  
 
 
 
@@ -261,6 +333,17 @@ class WindowAdmin(QDialog):
 		ProductTypeSelectButton= QPushButton('Change Product Type', self)
 		grid.addWidget(ProductTypeSelectButton, 12, 10)
 		ProductTypeSelectButton.clicked.connect(self.ProductTypeSelect_AdminWindow_onClick)
+
+		#Code below assigns some tooltips to the buttons
+		RemoveAllButton.setToolTip("Remove all products.")				
+		UpdateButton.setToolTip("Update current products.")
+		CancelButton.setToolTip("Clear the current selection.")
+		BackButton.setToolTip("Back to main window.")
+		if(InitVM.vm.Temp == 'C'):
+			Change_Temp_MSG= "Change product type to: Room [27°C]"
+		else: 
+			Change_Temp_MSG= "Change temperature to: Cold [4°C]"
+		ProductTypeSelectButton.setToolTip(Change_Temp_MSG)
 		
 		
 		self.setLayout(grid)
@@ -372,7 +455,7 @@ class WindowCatalog(QDialog):
 		self.height = Window_Height
 		self.InitUI()
 	def InitUI(self):
-		self.setWindowTitle('Vending Machine Products.')
+		self.setWindowTitle('Vending Machine Current Products.')
 		self.setGeometry(self.top, self.left, self.width, self.height)
 
 		grid = QGridLayout()

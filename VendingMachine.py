@@ -31,6 +31,7 @@ def get_Y(Queue):
 class NewVendingMachine:
 	def __init__(self):
 		self.list = []    #list[] allows to store the 25 queues that conforms the vending machine. a
+		self.Temp= None
 		Rows= "ABCDE"
 		Col= "12345"		
 		for i in Rows:

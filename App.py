@@ -125,7 +125,7 @@ class WindowBuy(QDialog):
 		self.height = Window_Height
 		self.InitUI()
 	def InitUI(self):
-		self.setWindowTitle("[This is willy\'s window.] Select the products you want to buy.")
+		self.setWindowTitle("Select the products you want to buy.")
 		self.setGeometry(self.top, self.left, self.width, self.height)
 
 		grid = QGridLayout()
@@ -238,6 +238,13 @@ class WindowAdmin(QDialog):
 		UpdateButton.clicked.connect(self.UpdateButton_AdminWindow_onClick)
 		CancelButton.clicked.connect(self.CancelButton_AdminWindow_onClick)
 		BackButton.clicked.connect(self.BackButton_AdminWindow_onClick)
+		
+		#The following button allows the administrator to change the product type.	
+		ProductTypeSelectButton= QPushButton('Change Product Type', self)
+		grid.addWidget(ProductTypeSelectButton, 12, 10)
+		ProductTypeSelectButton.clicked.connect(self.ProductTypeSelect_AdminWindow_onClick)
+		
+		
 		self.setLayout(grid)
 		self.show()
 
@@ -286,24 +293,8 @@ class WindowAdmin(QDialog):
 								InitVM.vm.UpdateQueue(i, int(j), CurrentP, int(SelQuantity))
 						#case when the selected product is "Empty"						
 						else:
-							InitVM.vm.UpdateQueue(i, int(j), Catalog.NoProduct, 0)
-						
-
-
-
-					 
-						
-					#This code manages the "Empty" selection on the product combo box.
-					#if:			
-				#and CurrentP != Catalog.NoProduct and CurrentP != None:
-
-				
-
-					#InitVM.vm.list[Pos].Quantity= int(SelectedQuantity) 				
-															
+							InitVM.vm.UpdateQueue(i, int(j), Catalog.NoProduct, 0)															
 		#This code clears both lists with the combo box reads. 
-		
-
 		comboSelectP.clear()
 		comboSelectQ.clear()
 		
@@ -313,7 +304,11 @@ class WindowAdmin(QDialog):
 
 	@pyqtSlot()
 	def RemoveAllButton_AdminWindow_onClick(self):
+		#This code clears both lists with the combo box reads and also the vending machine products.
+		comboSelectP.clear()
+		comboSelectQ.clear()
 		InitVM.vm.ClearVM()
+	 
 		self.cams = WindowCatalog()	
 		self.cams.show()
 		self.close()  
@@ -321,6 +316,28 @@ class WindowAdmin(QDialog):
 	@pyqtSlot()
 	def BackButton_AdminWindow_onClick(self):	
 		self.cams = WindowMain()	
+		self.cams.show()
+		self.close()  
+
+	@pyqtSlot()
+	def ProductTypeSelect_AdminWindow_onClick(self):		
+		if(InitVM.vm.Temp == 'C'):
+			#Case when current products temperature is cold.
+			InitVM.vm.Temp = 'R'
+			InitVM.InitProducts = InitVM.InitProducts_Room
+			
+		else:
+			#Case when current products temperature is room.
+			InitVM.vm.Temp = 'C'
+			InitVM.InitProducts = InitVM.InitProducts_Cold
+			
+
+		#This code clears both lists with the combo box reads and also the vending machine products.
+		comboSelectP.clear()
+		comboSelectQ.clear()
+		InitVM.vm.ClearVM()
+		
+		self.cams = WindowAdmin()	
 		self.cams.show()
 		self.close()  
 

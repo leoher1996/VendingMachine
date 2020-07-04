@@ -75,7 +75,7 @@ class WindowMain(QMainWindow):
 		buttonBuy = QPushButton("Buy", self)			#Button to buy a product. 
 		buttonAdmin = QPushButton(" Administration ", self) 	#Admin to set up the vending machine products.
 		MSG_Label = QLabel("Powered by Circuititos S.A.", self)	#Label to display an information message about the author.
-		
+
 		#The following label implements the temperature information. 
 		RoomTempMSG=("Temp: 27°C")         #Message for Room Temp products
 		ColdTempMSG=("Temp: 4°C")          #Message for Room Temp products	
@@ -125,14 +125,16 @@ class WindowMain(QMainWindow):
 
 	@pyqtSlot()
 	def buttonBuy_onClick(self):	
+		#This code cleans the list that stores the widtgets and current values for the spin boxes. 
+		SpinBoxesValues.clear()
+		SpinBoxes.clear()
+
 		self.cams = WindowBuy()	#Calls the WindowBuy window. 
 		self.cams.show()
 		self.close()                                  
 
 
 
-
-#TODO: This is the window that's being developed by willy. 
 ############################
 #This class implements the Buy Window. 
 #This window allows the user to buy products.  
@@ -152,18 +154,18 @@ class WindowBuy(QDialog):
 		grid = QGridLayout()
 		
 		#Lists used to store an inventary. They should match then InventoryQuantity[x] is the amount of products of InventoryProduct[x].
-		InventoryProduct =[]    #This is a list of products.
-		InventoryQuantity=[]    #This is tha amount of each product
+		self.InventoryProduct =[]    #This is a list of products.
+		self.InventoryQuantity=[]    #This is tha amount of each product
 		
 		for a in InitVM.vm.list:
 			if (a.Product != None and a.Product != NoProduct):							
-				if a.Product in InventoryProduct:				
-					Inventory_Index = InventoryProduct.index(a.Product)
-					InventoryQuantity[Inventory_Index]+=a.Quantity
+				if a.Product in self.InventoryProduct:				
+					Inventory_Index = self.InventoryProduct.index(a.Product)
+					self.InventoryQuantity[Inventory_Index]+=a.Quantity
 				else: 	
-					InventoryProduct.append(a.Product)
-					InventoryQuantity.append(a.Quantity)
-		if (len(InventoryProduct)==0):
+					self.InventoryProduct.append(a.Product)
+					self.InventoryQuantity.append(a.Quantity)
+		if (len(self.InventoryProduct)==0):
 			#This is the case where the vending machine is empty. 
 			#A label is added, stating that the vending machine is empty. 
 			MSG_NoProducts_Label = QLabel("The vending machine is empty.",self)	
@@ -193,24 +195,24 @@ class WindowBuy(QDialog):
 			
 			getTotalCost=0
 			n=0
-			for i in InventoryProduct:
+			for i in self.InventoryProduct:
 				n+=1			
 				#This code adds a pixmap throught the label. 
 				label = QLabel(self)				
 				Add_Image_As_Label(i,label)
-				Pos=InventoryProduct.index(i)
+				Pos=self.InventoryProduct.index(i)
 				X_pos=Pos%5 +1 
 				Y_pos=Pos//5  
 				grid.addWidget(label,X_pos,2*Y_pos)              			
 				#This code adds some useful information about each product.
-				AvailableMSG= "Available: " + str(InventoryQuantity[Pos]) + "\n" + "Cost: ₡" +  str(i.Cost)
+				AvailableMSG= "Available: " + str(self.InventoryQuantity[Pos]) + "\n" + "Cost: ₡" +  str(i.Cost)
 				MSGLabel = QLabel(AvailableMSG)
 				MSGLabel.setAlignment(Qt.AlignCenter) #Aligns the message info at the center of the screen.
 				grid.addWidget(MSGLabel,X_pos, (2*Y_pos)+1)   
 				#This code adds the spin boxes to select the amount of units you want to buy.
 				sp_box = QSpinBox()
 				sp_box.setMinimum(0)
-				sp_box.setMaximum(InventoryQuantity[Pos])
+				sp_box.setMaximum(self.InventoryQuantity[Pos])
 				if len(SpinBoxesValues) != 0:	
 					sp_box.setValue(int(SpinBoxesValues[Pos]))
 				grid.addWidget(sp_box, X_pos, (2*Y_pos)+2) 				
@@ -244,7 +246,13 @@ class WindowBuy(QDialog):
 			#Upgrade Button.
 			UpdateButton.clicked.connect(self.UpdateButton_onClick)		
 			UpdateButton.setToolTip("Add selected products to chart.")  #Sets tooltip.
-			
+			#Clear Cart Button.
+			ClearCartButton.clicked.connect(self.ClearCartButton_onClick)		
+			ClearCartButton.setToolTip("Clear current cart.")  #Sets tooltip.
+			#Buy Button.
+			BuyButton.clicked.connect(self.BuyButton_onClick)		
+			BuyButton.setToolTip("Buy the current cart.")  #Sets tooltip.			
+
 		#Sets some information for some Back Button. 
 		BackButton.clicked.connect(self.BackButton_onClick)		
 		BackButton.setToolTip("Back to main window.")  #Sets tooltip.
@@ -274,7 +282,31 @@ class WindowBuy(QDialog):
 		self.cams = WindowBuy()	
 		self.cams.show()
 		self.close()  		
+	@pyqtSlot()
+	def ClearCartButton_onClick(self):
+		#This code cleans the list that stores the widtgets and current values for the spin boxes. 
+		SpinBoxesValues.clear()
+		SpinBoxes.clear()
 
+		self.cams = WindowBuy()	
+		self.cams.show()
+		self.close()  	
+	@pyqtSlot()
+	def BuyButton_onClick(self):
+		if (len(SpinBoxesValues)==0):
+			#If user has not pressed update button yet.
+			self.UpdateButton_onClick()
+		
+		for t in self.InventoryProduct:
+					#InventoryQuantity		
+			CurrentIndex=self.InventoryProduct.index(t)
+			#print(t.Name)
+			#print(self.InventoryQuantity[CurrentIndex])
+			#print(SpinBoxesValues[CurrentIndex])
+			InitVM.vm.Extrac_A_Quantity_Of_Products(t,SpinBoxesValues[CurrentIndex])
+		self.cams = WindowMain()	
+		self.cams.show()
+		self.close()  
 
 
 

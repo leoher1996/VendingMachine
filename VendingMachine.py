@@ -116,18 +116,34 @@ class NewVendingMachine:
 				self.list[Pos].Quantity = 0 
 
 	
-	#TODO:
-	#def Product_Inventory(self):
-	#Function to create an inventory of the available products
+
+	############################
+	#Method Extract_Products will extract a unit of the product from the queue with the lower amount.	
+	#This function should be called after making sure the product is available.
+	#Args: The Product object we are looking for.
+	############################	
+	def Extract_Product(self, Product):
+		MinQuantity=5
+		for x in self.list: 
+			if (x.Product == Product):
+				if x.Quantity<=MinQuantity :
+					#Updates the information for the Queue with the lower amount of product.
+					MinQuantity=x.Quantity
+					Column= x.Column
+					Row= x.Row
+		#Remove one product from the queue with the lower amount. 
+		Pos= getListPos(Row, Column)
+		self.list[Pos].Remove_Products(1)
+	
+	############################
+	#Method Extrac_A_Quantity_Of_Products will extract a quantity of a product from the queues with the lower amount.	
+	#This function calls Extract_Product Quantity times. 
+	#Args: The Product object we are looking for.
+	############################	
+	def Extrac_A_Quantity_Of_Products(self, Product, Quantity):
+		for i in range(0,Quantity):
+			self.Extract_Product(Product)
 		
-
-	
-	#def Extract_Product(self, Product):
-	#This function will extract a unit of the product from the queue with the lower amount.		
-	
-
-
-
 
 
 

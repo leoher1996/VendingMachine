@@ -13,7 +13,6 @@ import Queue as  QueueFile
 
 NoProduct  = Catalog.NoProduct
 
-
 ############################
 #Below are included the Windows dimensions:
 ############################
@@ -26,6 +25,10 @@ Window_Height=800
 #Their positions should match so, the product on comboSelectP[x] has a quantity of unit stored at comboSelectQ[x]. 
 comboSelectP=[]
 comboSelectQ=[]
+
+#The following lists includes widget and the reading of the spinboxes, selecting the amount of a product to buy.
+SpinBoxes       = [] 
+SpinBoxesValues = []
 
 ###########################
 #Function FindProductMatchP returns the corresponding product that matches the selection from the combo box selection.
@@ -68,7 +71,6 @@ class WindowMain(QMainWindow):
 	def InitUI(self):
 		self.setWindowTitle(self.title)
 		self.setGeometry(self.top, self.left, self.width, self.height)
-		
 		#Button widgets and label present on the window.
 		buttonBuy = QPushButton("Buy", self)			#Button to buy a product. 
 		buttonAdmin = QPushButton(" Administration ", self) 	#Admin to set up the vending machine products.
@@ -188,8 +190,11 @@ class WindowBuy(QDialog):
 			Info_Column = QLabel("Select the quantity to buy",self)	
 			grid.addWidget(Info_Column,0, 2)
 			Info_Column.setAlignment(Qt.AlignCenter)
-
+			
+			getTotalCost=0
+			n=0
 			for i in InventoryProduct:
+				n+=1			
 				#This code adds a pixmap throught the label. 
 				label = QLabel(self)				
 				Add_Image_As_Label(i,label)
@@ -206,49 +211,70 @@ class WindowBuy(QDialog):
 				sp_box = QSpinBox()
 				sp_box.setMinimum(0)
 				sp_box.setMaximum(InventoryQuantity[Pos])
-				grid.addWidget(sp_box, X_pos, (2*Y_pos)+2)
-      				#sp.valueChanged.connect(self.valuechange)  				
-			
-				#This code sets the messages with the prices to pay				
-				Price_To_Pay_Per_Product= QLabel("+ ₡0")
-				grid.addWidget(Price_To_Pay_Per_Product, X_pos, (2*Y_pos)+3) 
+				if len(SpinBoxesValues) != 0:	
+					sp_box.setValue(int(SpinBoxesValues[Pos]))
+				grid.addWidget(sp_box, X_pos, (2*Y_pos)+2) 				
+				SpinBoxes.append(sp_box)	
 
-			#This label states the total amount of money the user has to pay.				
-			Price_To_Pay_Total= QLabel("Total: ₡0")
+				#This code sets the messages with the prices to pay
+				PriceForThisProduct = i.Cost* sp_box.value()
+				PriceToPayLabel = "+ ₡" + str(PriceForThisProduct) 				
+				Price_To_Pay_Per_Product= QLabel(PriceToPayLabel)
+				grid.addWidget(Price_To_Pay_Per_Product, X_pos, (2*Y_pos)+3) 
+				getTotalCost+= PriceForThisProduct
+			#This label states the total amount of money the user has to pay.	
+			Price_To_Pay_Total= QLabel("Total: ₡"+str(getTotalCost))
 			grid.addWidget(Price_To_Pay_Total, 6, 3) 
-	
 			#The following button allows the user to move to the main window. 	
 			BackButton= QPushButton('Back', self)	
-			grid.addWidget(BackButton, 7, 0)
-
+			grid.addWidget(BackButton, 8, 0)
 			#The following button allows the user to add products to a cart. 	
-			BuyButton= QPushButton('Add to cart', self)	
-			grid.addWidget(BuyButton, 6, 2)
-			BuyButton.setStyleSheet("background-color:Yellow; color: Black")	
-							
+			ClearCartButton= QPushButton('Clear cart', self)	
+			grid.addWidget(ClearCartButton, 7, 2)	
+			#The following button allows the user to add products to a cart. 	
+			UpdateButton= QPushButton('Update cart', self)	
+			grid.addWidget(UpdateButton, 6, 2)
+			UpdateButton.setStyleSheet("background-color:Yellow; color: Black")	
 			#The following button allows the user to buy a cart. 	
 			BuyButton= QPushButton('Buy cart', self)	
-			grid.addWidget(BuyButton, 7, 3)
+			grid.addWidget(BuyButton, 8, 3)
 			BuyButton.setStyleSheet("background-color:Green; color: Black")	
-
-		#Sets some information for the Back Button. 
-		BackButton.clicked.connect(self.BackButton_AdminBuy_onClick)		
+			
+			#The following info sets details for some Buttons: Update Cart, Clear Cart and Buy.
+			#Upgrade Button.
+			UpdateButton.clicked.connect(self.UpdateButton_onClick)		
+			UpdateButton.setToolTip("Add selected products to chart.")  #Sets tooltip.
+			
+		#Sets some information for some Back Button. 
+		BackButton.clicked.connect(self.BackButton_onClick)		
 		BackButton.setToolTip("Back to main window.")  #Sets tooltip.
 		
 		#Clear lists for the following calls of this function.
 		comboSelectP.clear()
 		comboSelectQ.clear()
- 
 		self.setLayout(grid)
 		self.show()
+
 	###################
 	#Widget Actions for WindowBuy:
 	###################
 	@pyqtSlot()
-	def BackButton_AdminBuy_onClick(self):	
+	def BackButton_onClick(self):	
 		self.cams = WindowMain()	
 		self.cams.show()
 		self.close()  
+	@pyqtSlot()
+	def UpdateButton_onClick(self):	
+		#SpinBoxReadings.clear() #Clear the selection list, for the following refresh window to store it's values.		
+		SpinBoxesValues.clear()
+		#This code allow the selections done on a Buy Window to persist after window refresh 
+		for w in SpinBoxes:
+			SpinBoxesValues.append(w.value())
+		SpinBoxes.clear()
+		self.cams = WindowBuy()	
+		self.cams.show()
+		self.close()  		
+
 
 
 

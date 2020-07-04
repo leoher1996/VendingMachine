@@ -9,6 +9,8 @@ python3 -m venv ~/VendingMachine
 Under ~/VendingMachine run: <source bin/activate>.
 4. Install PyQt5. (Under ~/VendingMachine)
 pip install PyQt5==5.9.2
-5. Include the program files under ~/VendingMachine. (Into the virtual environment)
-6. Under ~/VendingMachine, into the virtual environment run: <python3 main.py>
-7. To exit the virutal environment run: deactivate. 
+5. Install paho-mqtt. (Under ~/VendingMachine)
+pip install paho-mqtt
+6. Include the program files under ~/VendingMachine. (Into the virtual environment)
+7. Under ~/VendingMachine, into the virtual environment run: <python3 main.py>
+8. To exit the virutal environment run: deactivate. 

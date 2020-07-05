@@ -278,6 +278,7 @@ class WindowBuy(QDialog):
         self.cams = WindowMain()	
         self.cams.show()
         self.close()  
+        
     @pyqtSlot()
     def UpdateButton_onClick(self):	
         #SpinBoxReadings.clear() #Clear the selection list, for the following refresh window to store it's values.		
@@ -288,7 +289,8 @@ class WindowBuy(QDialog):
         SpinBoxes.clear()
         self.cams = WindowBuy()	
         self.cams.show()
-        self.close()  		
+        self.close()  	
+        	
     @pyqtSlot()
     def ClearCartButton_onClick(self):
         #This code cleans the list that stores the widtgets and current values for the spin boxes. 
@@ -297,23 +299,25 @@ class WindowBuy(QDialog):
 
         self.cams = WindowBuy()	
         self.cams.show()
-        self.close()  	
+        self.close()  
+        	
     @pyqtSlot()
     def BuyButton_onClick(self):
+        vending_mqtt.client_connect()
         if (len(SpinBoxesValues)==0):
             #If user has not pressed update button yet.
             self.UpdateButton_onClick()
-	
+    
         for t in self.InventoryProduct:	
             CurrentIndex=self.InventoryProduct.index(t)
             InitVM.vm.Extrac_A_Quantity_Of_Products(t,SpinBoxesValues[CurrentIndex])
+            
             if (self.InventoryQuantity[CurrentIndex]==SpinBoxesValues[CurrentIndex]):
-                vending_mqtt.client_connect()
                 vending_mqtt.client_publish(f"[{vending_mqtt.client_name}] sold {SpinBoxesValues[CurrentIndex]} of {t.Name}")
                 vending_mqtt.client_publish(f"[{vending_mqtt.client_name}] {t.Name} out of stock.")
             elif(SpinBoxesValues[CurrentIndex] != 0):
-                vending_mqtt.client_connect()
                 vending_mqtt.client_publish(f"[{vending_mqtt.client_name}] sold {SpinBoxesValues[CurrentIndex]} of {t.Name}")
+        
         self.cams = WindowMain()	
         self.cams.show()
         self.close()  
@@ -323,9 +327,9 @@ class WindowBuy(QDialog):
 
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Question)
-        msg.setText("This is a message box")
-        msg.setInformativeText("This is additional information")
-        msg.setWindowTitle("MessageBox demo")
+        msg.setText("Are you sure you want to make this purchase?")
+        # msg.setInformativeText("This is additional information")
+        msg.setWindowTitle("Purchase Confirmation.")
         
         msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
         msg.setDefaultButton(QMessageBox.No)
@@ -337,13 +341,13 @@ class WindowBuy(QDialog):
         
         self.cams = msg
         self.cams.show()
-    	
+        
     @pyqtSlot() 
     def ConfirmBuy(self):
         #self.cams = WindowMain()	
         #self.cams.show()
         #self.close()  
-       	self.BuyButton_onClick()
+        self.BuyButton_onClick()
 
         
 

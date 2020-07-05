@@ -256,7 +256,7 @@ class WindowBuy(QDialog):
             ClearCartButton.clicked.connect(self.ClearCartButton_onClick)		
             ClearCartButton.setToolTip("Clear current cart.")  #Sets tooltip.
             #Buy Button.
-            # BuyButton.clicked.connect(self.BuyButton_onClick)
+            #BuyButton.clicked.connect(self.BuyButton_onClick)
             BuyButton.clicked.connect(self.BuyButton_confirm_dialog)		
             BuyButton.setToolTip("Buy the current cart.")  #Sets tooltip.			
 
@@ -303,13 +303,9 @@ class WindowBuy(QDialog):
         if (len(SpinBoxesValues)==0):
             #If user has not pressed update button yet.
             self.UpdateButton_onClick()
-        
-        for t in self.InventoryProduct:
-                    #InventoryQuantity		
+	
+        for t in self.InventoryProduct:	
             CurrentIndex=self.InventoryProduct.index(t)
-            #print(t.Name)
-            #print(self.InventoryQuantity[CurrentIndex])
-            #print(SpinBoxesValues[CurrentIndex])
             InitVM.vm.Extrac_A_Quantity_Of_Products(t,SpinBoxesValues[CurrentIndex])
             if (self.InventoryQuantity[CurrentIndex]==SpinBoxesValues[CurrentIndex]):
                 vending_mqtt.client_connect()
@@ -324,7 +320,7 @@ class WindowBuy(QDialog):
 
     @pyqtSlot()
     def BuyButton_confirm_dialog(self):
-        print("ventanita")
+
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Question)
         msg.setText("This is a message box")
@@ -337,17 +333,18 @@ class WindowBuy(QDialog):
         buttonYes = msg.button(QMessageBox.Yes)
         buttonNo  = msg.button(QMessageBox.No)
         
-        buttonYes.clicked.connect(self.BuyButton_onClick)
+        buttonYes.clicked.connect(self.ConfirmBuy)
         
         self.cams = msg
         self.cams.show()
-        
-        if msg.clickedButton == buttonNo:
-            self.cams = WindowBuy()	
-            self.cams.show()
-            msg.close()
-        else:
-            msg.close()
+    	
+    @pyqtSlot() 
+    def ConfirmBuy(self):
+        #self.cams = WindowMain()	
+        #self.cams.show()
+        #self.close()  
+       	self.BuyButton_onClick()
+
         
 
 
